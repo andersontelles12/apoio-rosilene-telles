@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apoio Psicológico | Drª Rosilene Telles</title>
+  <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+  <div class="container">
+    <div id="inicial" class="tela ativa">
+      <h1>🌸 Apoio Psicológico</h1>
+      <p class="subtitulo">Espaço de escuta, cuidado e acolhimento</p>
+      <div class="card-profissional">
+        <h3>Profissional Responsável</h3>
+        <div id="dados">Carregando...</div>
+      </div>
+      <button onclick="mostrar('login')" class="btn azul">Já tenho conta</button>
+      <button onclick="mostrar('cadastro')" class="btn verde">Criar conta nova</button>
+    </div>
+
+    <div id="cadastro" class="tela">
+      <h2>Criar Conta 💙</h2>
+      <form onsubmit="gravarCadastro(event)">
+        <label>Nome:</label><input type="text" id="c-nome" required>
+        <label>E-mail:</label><input type="email" id="c-email" required>
+        <label>Telefone:</label><input type="tel" id="c-tel">
+        <label>Senha:</label><input type="password" id="c-senha" required>
+        <button class="btn azul">Cadastrar</button>
+        <button type="button" onclick="mostrar('inicial')" class="btn cinza">Voltar</button>
+      </form>
+      <p id="msg-c"></p>
+    </div>
+
+    <div id="login" class="tela">
+      <h2>Entrar</h2>
+      <form onsubmit="entrar(event)">
+        <label>E-mail:</label><input type="email" id="l-email" required>
+        <label>Senha:</label><input type="password" id="l-senha" required>
+        <button class="btn azul">Entrar</button>
+        <button type="button" onclick="mostrar('inicial')" class="btn cinza">Voltar</button>
+      </form>
+      <p id="msg-l"></p>
+    </div>
+
+    <div id="paciente" class="tela">
+      <h2>Olá, <span id="nome"></span>! 💙</h2>
+      <p>Você está em um espaço seguro.</p>
+      <div class="caixa">
+        <h3>Atendimento com Drª Rosilene Telles</h3>
+        <button onclick="mostrar('agendar')" class="btn verde">📅 Agendar</button>
+        <button onclick="iniciarChamada()" class="btn azul">📹 Videochamada</button>
+      </div>
+      <button onclick="sair()" class="btn vermelho">Sair</button>
+    </div>
+
+    <div id="agendar" class="tela">
+      <h2>Agendar 📅</h2>
+      <form onsubmit="gravarAgendamento(event)">
+        <label>Data:</label><input type="date" id="ag-data" required>
+        <label>Horário:</label><input type="time" id="ag-hora" required>
+        <label>Observação:</label><input type="text" id="ag-msg">
+        <button class="btn azul">Confirmar</button>
+        <button type="button" onclick="mostrar('paciente')" class="btn cinza">Voltar</button>
+      </form>
+      <p id="msg-ag"></p>
+    </div>
+
+    <div id="video" class="tela">
+      <h2>Atendimento 📹</h2>
+      <p id="status">Conectando...</p>
+      <div class="videos">
+        <div><span>Você</span><video id="eu" autoplay muted></video></div>
+        <div><span>Drª Rosilene Telles</span><video id="ela" autoplay></video></div>
+      </div>
+      <button onclick="encerrar()" class="btn vermelho">Encerrar</button>
+    </div>
+  </div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
