@@ -15,7 +15,7 @@ jobs:
       - name: Gerar APK
         run: |
           npm install -g cordova
-          cordova create app com.rosilene.apoio "Apoio Rosilene Telles"
+          cordova create app com.rtpsicologia.app "R\\T Psicologia"
           cd app
           rm -rf www
           cp -r ../public www
