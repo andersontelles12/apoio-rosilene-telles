@@ -38,11 +38,16 @@ app.get('/', (req, res) => {
 });
 
 // Dados da profissional
-app.get('/profissional', (req, res) => {
-  db.query('SELECT * FROM profissionais WHERE ativo = TRUE LIMIT 1', (erro, resul) => {
-    if (erro || !resul?.length) return res.status(404).json({erro: 'Não encontrada'});
-    res.json(resul[0]);
-  });
+app.get('/profissional', async (req, res) => {
+  const { data, error } = await supabase
+    .from('profissionais')
+    .select('*')
+    .eq('ativo', true)
+    .limit(1)
+    .single();
+  
+  if (error || !data) return res.status(404).json({erro: 'Profissional não encontrada'});
+  res.json(data);
 });
 
 // Cadastro
