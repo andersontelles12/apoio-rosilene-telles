@@ -13,12 +13,27 @@
       <p class="subtitulo">Espaço de escuta, cuidado e acolhimento</p>
       <div class="card-profissional">
         <h3>Profissional Responsável</h3>
-        <div id="dados">Carregando...</div>
-      </div>
-      <button onclick="mostrar('login')" class="btn azul">Já tenho conta</button>
-      <button onclick="mostrar('cadastro')" class="btn verde">Criar conta nova</button>
-    </div>
-
+    <div id="dados">Carregando...</div>
+<script>
+fetch('/profissional')
+  .then(r => r.json())
+  .then(dados => {
+    document.getElementById('dados').innerHTML = `
+      <strong style="font-size:1.15em">${dados.nome}</strong><br>
+      <em>${dados.especialidade}</em><br>
+      <span style="color:#3182ce; font-weight:600;">${dados.crp || ''}</span><br>
+      <p style="margin-top:10px; color:#4a5568; line-height:1.6;">${dados.descricao}</p>
+    `;
+  })
+  .catch(erro => {
+    document.getElementById('dados').innerHTML = `
+      <strong>Drª Rosilene Telles</strong><br>
+      <em>Psicóloga Clínica</em><br>
+      <span style="color:#3182ce; font-weight:600;">CRP-XX 12.345</span><br>
+      <p style="margin-top:10px;">Atendimento humanizado, terapia individual e suporte emocional.</p>
+    `;
+  });
+</script>
     <div id="cadastro" class="tela">
       <h2>Criar Conta 💙</h2>
       <form onsubmit="gravarCadastro(event)">
