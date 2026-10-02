@@ -1,82 +1,102 @@
 let usuario = null;
-const socket = io();
-const RTC = {iceServers:[{urls:'stun:stun.l.google.com:19302'}]};
-let conexao, fluxo;
 
-fetch('/profissional').then(r=>r.json()).then(d=>{
-  document.getElementById('dados').innerHTML = `<strong>${d.nome}</strong><br><em>${d.especialidade}</em><br><p>${d.descricao}</p>`;
-});
-
+// Mostrar/esconder telas
 function mostrar(nome){
   document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
   document.getElementById(nome).classList.add('ativa');
 }
 
+// Calcular idade automaticamente
+function calcularIdade(nascimento) {
+  const nasc = new Date(nascimento);
+  const hoje = new Date();
+  let idade = hoje.getFullYear() - nasc.getFullYear();
+  const m = hoje.getMonth() - nasc.getMonth();
+  if (m < 0 || (m === 0 && hoje.getDate() < nasc.getDate())) idade--;
+  return idade;
+}
+function atualizarIdade() {
+  const nasc = document.getElementById('c-nascimento').value;
+  if (nasc) {
+    document.getElementById('mostrar-idade').textContent = 'Idade: ' + calcularIdade(nasc) + ' anos';
+  }
+}
+
+// Cadastro
 async function gravarCadastro(e){
   e.preventDefault();
-  const r = await fetch('/cadastro',{
-    method:'POST',headers:{'Content-Type':'application/json'},
+  const r = await fetch('/cadastro', {
+    method:'POST', headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
-      nome:document.getElementById('c-nome').value,
-      email:document.getElementById('c-email').value,
-      telefone:document.getElementById('c-tel').value,
-      senha:document.getElementById('c-senha').value
+      nome: document.getElementById('c-nome').value,
+      nascimento: document.getElementById('c-nascimento').value,
+      cidade: document.getElementById('c-cidade').value,
+      email: document.getElementById('c-email').value,
+      senha: document.getElementById('c-senha').value
     })
   });
   const d = await r.json();
-  document.getElementById('msg-c').textContent = d.erro||d.mensagem;
-  document.getElementById('msg-c').className = r.ok?'sucesso':'erro';
-  if(d.sucesso) setTimeout(()=>mostrar('login'),1800);
+  document.getElementById('msg-c').textContent = d.erro || d.mensagem;
+  document.getElementById('msg-c').className = r.ok ? 'sucesso' : 'erro';
+  if (d.sucesso) setTimeout(()=>mostrar('login'), 2000);
 }
 
+// Login
 async function entrar(e){
   e.preventDefault();
-  const r = await fetch('/login',{
-    method:'POST',headers:{'Content-Type':'application/json'},
+  const r = await fetch('/login', {
+    method:'POST', headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
-      email:document.getElementById('l-email').value,
-      senha:document.getElementById('l-senha').value
+      email: document.getElementById('l-email').value,
+      senha: document.getElementById('l-senha').value
     })
   });
   const d = await r.json();
-  if(d.sucesso){usuario=d.nome;document.getElementById('nome').textContent=d.nome;mostrar('paciente');}
-  else{document.getElementById('msg-l').textContent=d.erro;document.getElementById('msg-l').className='erro';}
+  if (d.sucesso) {
+    usuario = d.nome;
+    document.getElementById('nome').textContent = d.nome;
+    mostrar('paciente');
+  } else {
+    document.getElementById('msg-l').textContent = d.erro;
+    document.getElementById('msg-l').className = 'erro';
+  }
 }
 
-function sair(){usuario=null;if(fluxo)encerrar();mostrar('inicial')}
+// Recuperar Senha
+async function enviarRecuperacao(e){
+  e.preventDefault();
+  const email = document.getElementById('rec-email').value;
+  
+  // Aviso: em produção configurar no Supabase
+  document.getElementById('msg-rec').innerHTML = 
+    `<span class="sucesso">✅ Se este e-mail estiver cadastrado, você receberá um link de redefinição em breve!</span>`;
+  
+  // Instrução: configurar no Supabase → Authentication → Settings → Redirect URL
+  // Adicionar: https://apoio-rosilene-telles.onrender.com/
+  
+  setTimeout(()=>mostrar('login'), 3000);
+}
 
+// Sair
+function sair(){
+  usuario = null;
+  mostrar('inicial');
+}
+
+// Agendamento
 async function gravarAgendamento(e){
   e.preventDefault();
-  const r = await fetch('/agendar',{
-    method:'POST',headers:{'Content-Type':'application/json'},
+  const r = await fetch('/agendar', {
+    method:'POST', headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
-      email:document.getElementById('l-email').value,
-      data:document.getElementById('ag-data').value,
-      horario:document.getElementById('ag-hora').value,
-      mensagem:document.getElementById('ag-msg').value
+      email: document.getElementById('l-email').value || prompt('Digite seu e-mail:'),
+      data: document.getElementById('ag-data').value,
+      horario: document.getElementById('ag-hora').value,
+      observacao: document.getElementById('ag-msg').value
     })
   });
   const d = await r.json();
-  document.getElementById('msg-ag').textContent = d.erro||d.mensagem;
-  document.getElementById('msg-ag').className = r.ok?'sucesso':'erro';
-  if(d.sucesso) setTimeout(()=>mostrar('paciente'),2000);
+  document.getElementById('msg-ag').textContent = d.erro || d.mensagem;
+  document.getElementById('msg-ag').className = r.ok ? 'sucesso' : 'erro';
+  if (d.sucesso) setTimeout(()=>mostrar('paciente'), 2500);
 }
-
-async function iniciarChamada(){
-  mostrar('video');
-  try{
-    fluxo = await navigator.mediaDevices.getUserMedia({video:true,audio:true});
-    document.getElementById('eu').srcObject = fluxo;
-    conexao = new RTCPeerConnection(RTC);
-    fluxo.getTracks().forEach(t=>conexao.addTrack(t,fluxo));
-    conexao.ontrack = e=>{document.getElementById('ela').srcObject=e.streams[0];document.getElementById('status').textContent='✅ Conectada!';};
-    conexao.onicecandidate = e=>{if(e.candidate)socket.emit('candidato',e.candidate)};
-    socket.on('oferta',async o=>{await conexao.setRemoteDescription(new RTCSessionDescription(o));const r=await conexao.createAnswer();await conexao.setLocalDescription(r);socket.emit('resposta',r);});
-    socket.on('resposta',async r=>await conexao.setRemoteDescription(new RTCSessionDescription(r)));
-    socket.on('candidato',async c=>{if(c)await conexao.addIceCandidate(new RTCIceCandidate(c))});
-    const oferta = await conexao.createOffer();await conexao.setLocalDescription(oferta);socket.emit('oferta',oferta);
-    document.getElementById('status').textContent='🔔 Chamando...';
-  }catch{document.getElementById('status').textContent='❌ Permita câmera/microfone';}
-}
-
-function encerrar(){if(fluxo)fluxo.getTracks().forEach(t=>t.stop());if(conexao)conexao.close();mostrar('paciente');}
