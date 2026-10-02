@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Apoio Psicológico | Drª Rosilene Telles</title>
+  <title>R\T Psicologia</title>
   <link rel="stylesheet" href="estilo.css">
 </head>
 <body>
   <div class="container">
     <!-- Tela Inicial -->
     <div id="inicial" class="tela ativa">
-      <h1>🌸 Apoio Psicológico</h1>
+      <h1 class="logo">R\T Psicologia</h1>
       <p class="subtitulo">Espaço de escuta, cuidado e acolhimento</p>
       
       <div class="card-profissional">
@@ -18,8 +18,8 @@
         <div id="dados">
           <strong>Drª Rosilene Telles</strong><br>
           <em>Psicóloga Clínica</em><br>
-          <span style="color:#3182ce; font-weight:600;">CRP: 06/217811</span><br>
-          <p style="margin-top:10px; color:#4a5568;">Atendimento humanizado, terapia individual e suporte emocional.</p>
+          <span class="crp">CRP: 06/217811</span><br>
+          <p>Atendimento humanizado, terapia individual e suporte emocional.</p>
         </div>
       </div>
       
@@ -27,36 +27,58 @@
       <button onclick="mostrar('cadastro')" class="btn verde">Criar conta nova</button>
     </div>
 
-    <!-- Cadastro -->
-    <div id="cadastro" class="tela">
-      <h2>Criar Conta 💙</h2>
-      <form onsubmit="gravarCadastro(event)">
-        <label>Nome completo:</label>
-        <input type="text" id="c-nome" required>
-        <label>E-mail:</label>
-        <input type="email" id="c-email" required>
-        <label>Telefone com WhatsApp:</label>
-        <input type="tel" id="c-tel">
-        <label>Senha:</label>
-        <input type="password" id="c-senha" required>
-        <button class="btn azul">Cadastrar</button>
-        <button type="button" onclick="mostrar('inicial')" class="btn cinza">Voltar</button>
-      </form>
-      <p id="msg-c"></p>
-    </div>
-
     <!-- Login -->
     <div id="login" class="tela">
-      <h2>Entrar na sua conta</h2>
+      <h2>Entrar</h2>
       <form onsubmit="entrar(event)">
         <label>E-mail:</label>
         <input type="email" id="l-email" required>
         <label>Senha:</label>
         <input type="password" id="l-senha" required>
         <button class="btn azul">Entrar</button>
+        <button type="button" onclick="mostrar('recuperar')" class="link-esqueci">Esqueci minha senha</button>
         <button type="button" onclick="mostrar('inicial')" class="btn cinza">Voltar</button>
       </form>
       <p id="msg-l"></p>
+    </div>
+
+    <!-- Recuperar Senha -->
+    <div id="recuperar" class="tela">
+      <h2>Redefinir Senha</h2>
+      <p>Digite seu e-mail. Enviaremos um link para você criar uma nova senha.</p>
+      <form onsubmit="enviarRecuperacao(event)">
+        <label>E-mail cadastrado:</label>
+        <input type="email" id="rec-email" required>
+        <button class="btn azul">Enviar Link</button>
+        <button type="button" onclick="mostrar('login')" class="btn cinza">Voltar</button>
+      </form>
+      <p id="msg-rec"></p>
+    </div>
+
+    <!-- Cadastro -->
+    <div id="cadastro" class="tela">
+      <h2>Criar Conta 💙</h2>
+      <form onsubmit="gravarCadastro(event)">
+        <label>Nome Completo:</label>
+        <input type="text" id="c-nome" required>
+        
+        <label>Data de Nascimento:</label>
+        <input type="date" id="c-nascimento" onchange="atualizarIdade()" required>
+        <p class="idade" id="mostrar-idade">Idade: —</p>
+        
+        <label>Cidade / Município:</label>
+        <input type="text" id="c-cidade" placeholder="Sua cidade">
+        
+        <label>E-mail:</label>
+        <input type="email" id="c-email" required>
+        
+        <label>Criar Senha:</label>
+        <input type="password" id="c-senha" required placeholder="Mínimo 6 caracteres">
+        
+        <button class="btn verde">Criar Conta</button>
+        <button type="button" onclick="mostrar('inicial')" class="btn cinza">Voltar</button>
+      </form>
+      <p id="msg-c"></p>
     </div>
 
     <!-- Área do Paciente -->
@@ -66,8 +88,22 @@
       
       <div class="caixa">
         <h3>Atendimento com Drª Rosilene Telles</h3>
+        
         <button onclick="mostrar('agendar')" class="btn verde">📅 Agendar Horário</button>
-        <button onclick="iniciarChamada()" class="btn azul">📹 Iniciar Videochamada</button>
+        
+        <div class="divisor"></div>
+        <h4>Videochamada</h4>
+        <p class="dica">Escolha a plataforma de sua preferência:</p>
+        
+        <a href="https://meet.google.com" target="_blank" class="btn azul link-btn">📹 Google Meet</a>
+        <a href="https://teams.microsoft.com" target="_blank" class="btn azul link-btn">💼 Microsoft Teams</a>
+        <a href="https://zoom.us" target="_blank" class="btn azul link-btn">📺 Zoom</a>
+        <a href="https://wa.me/5511999999999" target="_blank" class="btn verde link-btn">💬 WhatsApp</a>
+        
+        <p class="dica" style="margin-top:15px;">
+          <strong>Link direto da chamada:</strong><br>
+          Compartilharei o link no momento agendado 💙
+        </p>
       </div>
       
       <button onclick="sair()" class="btn vermelho">Sair da conta</button>
@@ -83,21 +119,10 @@
         <input type="time" id="ag-hora" required>
         <label>Observação (opcional):</label>
         <input type="text" id="ag-msg" placeholder="Motivo, preferências...">
-        <button class="btn azul">Confirmar Agendamento</button>
+        <button class="btn verde">Confirmar Agendamento</button>
         <button type="button" onclick="mostrar('paciente')" class="btn cinza">Voltar</button>
       </form>
       <p id="msg-ag"></p>
-    </div>
-
-    <!-- Videochamada -->
-    <div id="video" class="tela">
-      <h2>Atendimento em Andamento 📹</h2>
-      <p id="status">Conectando...</p>
-      <div class="videos">
-        <div><span>Você</span><video id="eu" autoplay muted playsinline></video></div>
-        <div><span>Drª Rosilene Telles</span><video id="ela" autoplay playsinline></video></div>
-      </div>
-      <button onclick="encerrar()" class="btn vermelho">Encerrar Chamada</button>
     </div>
   </div>
 
