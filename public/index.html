@@ -16,12 +16,15 @@
     <div id="dados">Carregando...</div>
 <script>
 fetch('/profissional')
-  .then(r => r.json())
+  .then(r => {
+    if (!r.ok) throw new Error('Não encontrado');
+    return r.json();
+  })
   .then(dados => {
     document.getElementById('dados').innerHTML = `
       <strong style="font-size:1.15em">${dados.nome}</strong><br>
       <em>${dados.especialidade}</em><br>
-      <span style="color:#3182ce; font-weight:600;">${dados.CRP: 06/217811 ''}</span><br>
+      <span style="color:#3182ce; font-weight:600;">CRP: 06/217811</span><br>
       <p style="margin-top:10px; color:#4a5568; line-height:1.6;">${dados.descricao}</p>
     `;
   })
@@ -29,10 +32,10 @@ fetch('/profissional')
     document.getElementById('dados').innerHTML = `
       <strong>Drª Rosilene Telles</strong><br>
       <em>Psicóloga Clínica</em><br>
-      <span style="color:#3182ce; font-weight:600;">CRP:06/217811</span><br>
-      <p>Atendimento humanizado, terapia individual e suporte emocional.</p>
+      <span style="color:#3182ce; font-weight:600;">CRP: 06/217811</span><br>
+      <p style="margin-top:10px;">Atendimento humanizado, terapia individual e suporte emocional.</p>
     `;
-})
+  });
 </script>
     <div id="cadastro" class="tela">
       <h2>Criar Conta 💙</h2>
