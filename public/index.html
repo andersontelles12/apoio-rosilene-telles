@@ -21,7 +21,7 @@ fetch('/profissional')
     document.getElementById('dados').innerHTML = `
       <strong style="font-size:1.15em">${dados.nome}</strong><br>
       <em>${dados.especialidade}</em><br>
-      <span style="color:#3182ce; font-weight:600;">${dados.crp || ''}</span><br>
+      <span style="color:#3182ce; font-weight:600;">${dados.CRP: 06/217811 ''}</span><br>
       <p style="margin-top:10px; color:#4a5568; line-height:1.6;">${dados.descricao}</p>
     `;
   })
